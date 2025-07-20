@@ -5,68 +5,599 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EventEase - Worker Login/Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .left-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.9), rgba(0, 86, 179, 0.9)), 
+                        url('D:/eventease/login.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 40px;
+            position: relative;
+        }
+
+        .left-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(13, 110, 253, 0.8), rgba(108, 117, 125, 0.6));
+        }
+
+        .left-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .brand-logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #fff, #e3f2fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .feature-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .feature-item i {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            color: #81c784;
+        }
+
+        .right-section {
+            flex: 1;
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .login-form-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .welcome-subtitle {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .form-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 25px;
+            padding: 5px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .tab-button {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+        }
+
+        .tab-button.active {
+            background: #1976d2;
+            color: white;
+            box-shadow: 0 2px 10px rgba(25, 118, 210, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-label {
+            color: #1976d2;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            display: block;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1976d2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1976d2;
+            font-size: 1.1rem;
+            z-index: 1;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #43a047, #2e7d32);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(67, 160, 71, 0.4);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .social-btn.google { color: #db4437; }
+        .social-btn.facebook { color: #4267b2; }
+        .social-btn.apple { color: #000; }
+
+        .back-to-home {
+            display: inline-block;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .back-to-home:hover {
+            color: #1976d2;
+        }
+
+        .register-prompt {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .register-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .register-link:hover {
+            text-decoration: underline;
+        }
+
+        .form-text {
+            color: #999;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .tab-content {
+            position: relative;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left: 4px solid #43a047;
+        }
+
+        .alert-danger {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .left-section {
+                flex: none;
+                height: 40vh;
+            }
+            
+            .right-section {
+                flex: none;
+                height: 60vh;
+                padding: 20px;
+            }
+            
+            .login-form-container {
+                padding: 20px;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .brand-logo {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-section {
+                height: 30vh;
+            }
+            
+            .right-section {
+                height: 70vh;
+                padding: 15px;
+            }
+            
+            .welcome-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card p-4">
-                    <h2 class="card-title text-center mb-4">Worker</h2>
+<body>
+    <div class="main-container">
+        <!-- Left Section with Background Image -->
+        <div class="left-section">
+            <div class="left-content">
+                <div class="brand-logo">EventEase</div>
+                <p class="brand-subtitle">
+                    Join our team of dedicated workers and help create memorable experiences that bring people together
+                </p>
+                <ul class="feature-list">
+                    <li class="feature-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Flexible Work Opportunities</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-users"></i>
+                        <span>Collaborative Environment</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Track Your Progress</span>
+                    </li>
+                    <li class="feature-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Secure Platform</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
 
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            <div class="mb-3">
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
+        <!-- Right Section with Login Form -->
+        <div class="right-section">
+            <div class="login-form-container">
+                <div class="welcome-text">
+                    <h1 class="welcome-title">Worker Portal</h1>
+                    <p class="welcome-subtitle">Access your worker dashboard</p>
+                </div>
 
-                    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-                            <form method="POST" action="{{ url_for('worker_login_register') }}">
-                                <input type="hidden" name="action" value="login">
-                                <div class="mb-3">
-                                    <label for="loginEmail" class="form-label">Email address</label>
-                                    <input type="email" class="form-control" id="loginEmail" name="email" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="loginPassword" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="loginPassword" name="password" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100">Login</button>
-                            </form>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
                         </div>
-                        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-                            <form method="POST" action="{{ url_for('worker_login_register') }}">
-                                <input type="hidden" name="action" value="register">
-                                <div class="mb-3">
-                                    <label for="registerEmail" class="form-label">Email address</label>
-                                    <input type="email" class="form-control" id="registerEmail" name="email" required>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="form-tabs">
+                    <button class="tab-button active" onclick="switchTab('login')">Login</button>
+                    <button class="tab-button" onclick="switchTab('register')">Register</button>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Login Form -->
+                    <div class="tab-pane active" id="login">
+                        <form method="POST" action="{{ url_for('worker_login_register') }}">
+                            <input type="hidden" name="action" value="login">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email address</label>
+                                <div class="input-group">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" class="form-control" id="loginEmail" name="email" placeholder="Enter your email" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="registerPassword" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="registerPassword" name="password" required>
-                                    <div id="passwordHelp" class="form-text">Minimum 6 characters.</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <div class="input-group">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
                                 </div>
-                                <button type="submit" class="btn btn-success w-100">Register</button>
-                            </form>
+                            </div>
+
+                            <button type="submit" class="btn-login">Login</button>
+                        </form>
+
+                        <div class="divider">
+                            <span>OR</span>
+                        </div>
+
+                        <div class="social-buttons">
+                            <div class="social-btn google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-btn facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-btn apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+
+                        <div class="register-prompt">
+                            Don't have an account? <a href="#" class="register-link" onclick="switchTab('register')">Register Now</a>
                         </div>
                     </div>
-                    <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Back to Home</a>
+
+                    <!-- Register Form -->
+                    <div class="tab-pane" id="register">
+                        <form method="POST" action="{{ url_for('worker_login_register') }}">
+                            <input type="hidden" name="action" value="register">
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email address</label>
+                                <div class="input-group">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    <input type="email" class="form-control" id="registerEmail" name="email" placeholder="Enter your email" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <div class="input-group">
+                                    <i class="fas fa-lock input-icon"></i>
+                                    <input type="password" class="form-control" id="registerPassword" name="password" placeholder="Create password" required>
+                                </div>
+                                <div class="form-text">Minimum 6 characters.</div>
+                            </div>
+
+                            <button type="submit" class="btn-register">Register</button>
+                        </form>
+
+                        <div class="divider">
+                            <span>OR</span>
+                        </div>
+
+                        <div class="social-buttons">
+                            <div class="social-btn google">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-btn facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-btn apple">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                        </div>
+
+                        <div class="register-prompt">
+                            Already have an account? <a href="#" class="register-link" onclick="switchTab('login')">Login</a>
+                        </div>
+                    </div>
                 </div>
+
+                <a href="{{ url_for('index') }}" class="back-to-home">← Back to Home</a>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script>
+        function switchTab(tabName) {
+            // Remove active class from all tabs and tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            
+            // Add active class to clicked tab button
+            event.target.classList.add('active');
+            
+            // Show corresponding tab pane
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Add some interactive effects
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 </body>
 </html>
