@@ -149,7 +149,90 @@ def post_job():
 
     return render_template('post_job.html')
 
+@app.route('/manager/my_jobs')
+def manager_my_jobs():
+    if 'user_id' not in session or session.get('user_type') != 'manager':
+        flash('Please login as an Event Manager to view your jobs.', 'danger')
+        return redirect(url_for('manager_login_register'))
 
+    manager_id = session['user_id']
+    jobs_ref = db.collection('jobs').where('manager_id', '==', manager_id).order_by('posted_at', direction=firestore.Query.DESCENDING)
+    my_jobs = []
+    for doc in jobs_ref.stream():
+        job_data = doc.to_dict()
+        job_data['id'] = doc.id # Store the document ID
+        my_jobs.append(job_data)
+
+    return render_template('manager_my_jobs.html', my_jobs=my_jobs, user_email=session['user_email'])
+
+@app.route('/manager/job/<job_id>/applications')
+def view_job_applications(job_id):
+    if 'user_id' not in session or session.get('user_type') != 'manager':
+        flash('Please login as an Event Manager to view applications.', 'danger')
+        return redirect(url_for('manager_login_register'))
+
+    # Verify that the job belongs to the logged-in manager
+    job_doc = db.collection('jobs').document(job_id).get()
+    if not job_doc.exists or job_doc.to_dict().get('manager_id') != session['user_id']:
+        flash('You are not authorized to view applications for this job.', 'danger')
+        return redirect(url_for('manager_my_jobs')) # Redirect back to my jobs list
+
+    job_title = job_doc.to_dict().get('job_title', 'Unknown Job')
+
+    applications_ref = db.collection('applications').where('job_id', '==', job_id).order_by('applied_at', direction=firestore.Query.ASCENDING)
+    applications = []
+    for doc in applications_ref.stream():
+        app_data = doc.to_dict()
+        app_data['id'] = doc.id # Store the application ID
+        applications.append(app_data)
+
+    return render_template('manager_applications.html',
+                           job_title=job_title,
+                           applications=applications,
+                           job_id=job_id,
+                           user_email=session['user_email'])
+
+@app.route('/manager/application/<application_id>/<action>')
+def accept_reject_application(application_id, action):
+    if 'user_id' not in session or session.get('user_type') != 'manager':
+        flash('Please login as an Event Manager to manage applications.', 'danger')
+        return redirect(url_for('manager_login_register'))
+
+    if action not in ['accept', 'reject']:
+        flash('Invalid action.', 'danger')
+        return redirect(url_for('manager_dashboard')) # Or redirect to a specific error page
+
+    try:
+        app_ref = db.collection('applications').document(application_id)
+        application_doc = app_ref.get()
+
+        if not application_doc.exists:
+            flash('Application not found.', 'danger')
+            return redirect(url_for('manager_my_jobs'))
+
+        app_data = application_doc.to_dict()
+        job_id = app_data.get('job_id')
+
+        # Security Check: Ensure the manager owns this job
+        job_doc = db.collection('jobs').document(job_id).get()
+        if not job_doc.exists or job_doc.to_dict().get('manager_id') != session['user_id']:
+            flash('You are not authorized to manage this application.', 'danger')
+            return redirect(url_for('manager_my_jobs'))
+
+        # Update application status
+        app_ref.update({'status': action}) # 'accept' or 'reject'
+
+        flash(f'Application {action}ed successfully!', 'success')
+        return redirect(url_for('view_job_applications', job_id=job_id))
+
+    except Exception as e:
+        flash(f'Error processing application: {e}', 'danger')
+        # Try to redirect back to the applications page if job_id is known
+        if 'job_id' in locals(): # Check if job_id was successfully retrieved earlier
+            return redirect(url_for('view_job_applications', job_id=job_id))
+        else:
+            return redirect(url_for('manager_my_jobs'))
+        
 # --- Worker Routes ---
 @app.route('/worker_login_register', methods=['GET', 'POST'])
 def worker_login_register():
@@ -254,6 +337,41 @@ def apply_job(job_id):
         flash(f'Error applying for job: {e}', 'danger')
         return redirect(url_for('view_jobs'))
 
+@app.route('/worker/my_applications')
+def worker_my_applications():
+    if 'user_id' not in session or session.get('user_type') != 'worker':
+        flash('Please login as a Worker to view your applications.', 'danger')
+        return redirect(url_for('worker_login_register'))
+
+    worker_id = session['user_id']
+    applications_ref = db.collection('applications').where('worker_id', '==', worker_id).order_by('applied_at', direction=firestore.Query.DESCENDING)
+    my_applications = []
+
+    for app_doc in applications_ref.stream():
+        app_data = app_doc.to_dict()
+        app_data['id'] = app_doc.id # Store the application document ID
+
+        # Fetch associated job details
+        job_id = app_data.get('job_id')
+        if job_id:
+            job_doc = db.collection('jobs').document(job_id).get()
+            if job_doc.exists:
+                job_data = job_doc.to_dict()
+                app_data['job_title'] = job_data.get('job_title', 'N/A')
+                app_data['job_location'] = job_data.get('location', 'N/A')
+                app_data['job_date'] = job_data.get('job_date', 'N/A')
+            else:
+                app_data['job_title'] = 'Job Not Found'
+                app_data['job_location'] = 'N/A'
+                app_data['job_date'] = 'N/A'
+        else:
+            app_data['job_title'] = 'N/A'
+            app_data['job_location'] = 'N/A'
+            app_data['job_date'] = 'N/A'
+
+        my_applications.append(app_data)
+
+    return render_template('worker_my_applications.html', my_applications=my_applications, user_email=session['user_email'])
 
 # --- Logout Route (Common for both) ---
 @app.route('/logout')
