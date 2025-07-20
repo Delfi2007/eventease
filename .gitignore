@@ -5,3 +5,6 @@ __pycache__/
 
 # Firebase Admin SDK private key
 *.json
+
+#environment variables
+.env
