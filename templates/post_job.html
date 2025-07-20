@@ -494,12 +494,12 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="description" class="form-label">
-                                    <i class="fas fa-file-alt input-icon"></i>
-                                    Job Description
-                                </label>
-                                <textarea class="form-control" id="description" name="description" rows="4" 
-                                          placeholder="Describe the role, responsibilities, and requirements..." required></textarea>
+                                <label for="description" class="form-label">Job Description</label>
+                                <div class="input-group">
+                                    <textarea class="form-control" id="description" name="description" rows="5" required>{{ description }}</textarea>
+                                    <button type="button" class="btn btn-outline-secondary" id="generateDescriptionBtn">Generate Suggestion</button>
+                                </div>
+                                <small class="form-text text-muted">Click to get an AI-generated description based on title and category.</small>
                             </div>
 
                             <div class="form-row">
@@ -632,6 +632,44 @@
                 this.style.height = this.scrollHeight + 'px';
             });
         });
+
+        document.getElementById('generateDescriptionBtn').addEventListener('click', async function() {
+        const jobTitle = document.getElementById('job_title').value;
+        const category = document.getElementById('category').value;
+        const descriptionField = document.getElementById('description');
+
+        if (!jobTitle || !category) {
+            alert('Please enter a Job Title and select a Category before generating a description.');
+            return;
+        }
+
+        this.disabled = true; // Disable button while fetching
+        this.textContent = 'Generating...'; // Change button text
+
+        try {
+            const response = await fetch('{{ url_for("generate_job_description") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ job_title: jobTitle, category: category })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                descriptionField.value = data.description;
+            } else {
+                alert('Error generating description: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            alert('An error occurred while connecting to the AI service.');
+        } finally {
+            this.disabled = false; // Re-enable button
+            this.textContent = 'Generate Suggestion'; // Restore button text
+        }
+    });
     </script>
 </body>
 </html>

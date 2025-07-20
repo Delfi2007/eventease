@@ -1,7 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 import os
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
+from dotenv import load_dotenv 
+import google.generativeai as genai 
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- Firebase Initialization ---
 try:
@@ -19,7 +24,17 @@ app = Flask(__name__)
 # IMPORTANT: Change this for production! Use a strong, random key.
 app.secret_key = 'your_super_secret_key_here' # For example: os.urandom(24)
 
-
+# Configure Gemini API
+try:
+    gemini_api_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_api_key:
+        raise ValueError("GEMINI_API_KEY not found in environment variables. Please set it in your .env file.")
+    genai.configure(api_key=gemini_api_key)
+    gemini_model = genai.GenerativeModel('models/gemini-2.0-flash') # This line still needs to be adjusted later
+    print("Gemini AI initialized successfully.")
+except Exception as e:
+    print(f"Error initializing Gemini AI: {e}")
+    gemini_model = None
 # --- Common Authentication Functions ---
 def register_user(email, password, user_type):
     try:
@@ -232,7 +247,35 @@ def accept_reject_application(application_id, action):
             return redirect(url_for('view_job_applications', job_id=job_id))
         else:
             return redirect(url_for('manager_my_jobs'))
-        
+
+@app.route('/manager/generate_job_description', methods=['POST'])
+def generate_job_description():
+    if 'user_id' not in session or session.get('user_type') != 'manager':
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    job_title = request.json.get('job_title')
+    category = request.json.get('category')
+
+    if not job_title or not category:
+        return jsonify({'error': 'Job title and category are required.'}), 400
+
+    if not gemini_model: # Check if Gemini was initialized
+        return jsonify({'error': 'Gemini AI not available. Please check server logs.'}), 500
+
+    try:
+        prompt = f"Write a brief (2-3 sentences), engaging, professional job description for a '{category}' position titled '{job_title}'. Focus on attracting suitable candidates."
+
+        # Using generate_content for the actual API call
+        response = gemini_model.generate_content(prompt)
+
+        # Access the text from the response
+        generated_text = response.text
+
+        return jsonify({'description': generated_text})
+    except Exception as e:
+        print(f"Error generating description with Gemini AI: {e}")
+        return jsonify({'error': f'Failed to generate description: {e}'}), 500
+
 # --- Worker Routes ---
 @app.route('/worker_login_register', methods=['GET', 'POST'])
 def worker_login_register():
