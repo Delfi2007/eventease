@@ -5,6 +5,7 @@ from firebase_admin import credentials, auth, firestore
 
 # --- Firebase Initialization ---
 try:
+    # Ensure this path is correct for your firebase_credentials.json file
     cred = credentials.Certificate("firebase_credentials.json")
     firebase_admin.initialize_app(cred)
     db = firestore.client()
@@ -15,13 +16,9 @@ except Exception as e:
 
 # --- Flask App Setup ---
 app = Flask(__name__)
-app.secret_key = 'your_super_secret_key_here' # IMPORTANT: Change this for production!
+# IMPORTANT: Change this for production! Use a strong, random key.
+app.secret_key = 'your_super_secret_key_here' # For example: os.urandom(24)
 
-# --- Routes ---
-
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 # --- Common Authentication Functions ---
 def register_user(email, password, user_type):
@@ -39,21 +36,26 @@ def register_user(email, password, user_type):
 
 def login_user(email, password):
     try:
-        # Firebase Admin SDK doesn't directly log in users or handle passwords
-        # We'll simulate login success by trying to get user by email and then
-        # relying on frontend JavaScript (which we won't build in this MVP)
-        # or implicitly trusting the credentials for our server-side auth check.
-        # For this MVP, we will only check if user exists. Real login would use
-        # Firebase Client SDK on frontend or more complex server-side token verification.
+        # As discussed, for this MVP, we are simplifying login verification
+        # using the Admin SDK to check if a user with the email exists.
+        # A real app would use the Firebase Client SDK for password validation
+        # and token exchange for server-side session management.
         user_record = auth.get_user_by_email(email)
-        # For a real app, you would verify the password here too (e.g. via client-side SDK)
-        # For server-side validation, we are simply confirming the user exists in Firebase Auth.
-        # The password itself is not exposed or verifiable by the Admin SDK.
+        # In a real scenario, you'd also verify the password here securely
+        # if this was a purely server-side auth, but Firebase Admin SDK
+        # does not expose password verification.
         return user_record, None
     except auth.AuthError as e:
         return None, "Invalid email or password." # Generic message for security
     except Exception as e:
         return None, str(e)
+
+
+# --- Routes ---
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 # --- Event Manager Routes ---
@@ -105,10 +107,10 @@ def post_job():
         job_title = request.form['job_title']
         description = request.form['description']
         required_staff_count = request.form['required_staff_count']
-        job_date = request.form['job_date'] # We will use a text input for simplicity for now
-        job_time = request.form['job_time'] # We will use a text input for simplicity for now
+        job_date = request.form['job_date']
+        job_time = request.form['job_time']
         location = request.form['location']
-        pay_rate = request.form['pay_rate'] # Simple text field
+        pay_rate = request.form['pay_rate']
         category = request.form['category']
 
         # Basic validation
@@ -141,11 +143,12 @@ def post_job():
             }
             db.collection('jobs').add(job_data)
             flash('Job posted successfully!', 'success')
-            return redirect(url_for('manager_dashboard')) # Redirect to dashboard or my jobs list
+            return redirect(url_for('manager_dashboard'))
         except Exception as e:
             flash(f'Error posting job: {e}', 'danger')
 
     return render_template('post_job.html')
+
 
 # --- Worker Routes ---
 @app.route('/worker_login_register', methods=['GET', 'POST'])
@@ -186,6 +189,70 @@ def worker_dashboard():
         flash('Please login as a Worker to access this page.', 'danger')
         return redirect(url_for('worker_login_register'))
     return render_template('worker_dashboard.html', user_email=session['user_email'])
+
+
+@app.route('/worker/jobs')
+def view_jobs():
+    if 'user_id' not in session or session.get('user_type') != 'worker':
+        flash('Please login as a Worker to view jobs.', 'danger')
+        return redirect(url_for('worker_login_register'))
+
+    jobs_ref = db.collection('jobs').where('status', '==', 'active').order_by('posted_at', direction=firestore.Query.DESCENDING)
+    jobs = []
+    for doc in jobs_ref.stream():
+        job_data = doc.to_dict()
+        job_data['id'] = doc.id # Store the document ID
+        jobs.append(job_data)
+
+    return render_template('worker_jobs.html', jobs=jobs, user_email=session['user_email'])
+
+
+@app.route('/worker/apply_job/<job_id>')
+def apply_job(job_id):
+    if 'user_id' not in session or session.get('user_type') != 'worker':
+        flash('Please login as a Worker to apply for jobs.', 'danger')
+        return redirect(url_for('worker_login_register'))
+
+    worker_id = session['user_id']
+    worker_email = session['user_email']
+
+    # Check if the worker has already applied for this job
+    # Use a composite query for both job_id and worker_id
+    existing_application_query = db.collection('applications') \
+        .where('job_id', '==', job_id) \
+        .where('worker_id', '==', worker_id) \
+        .limit(1).get() # limit(1) makes it efficient as we only need to know if one exists
+
+    if existing_application_query: # if the list is not empty
+        for doc in existing_application_query: # iterate to check if any document exists
+            flash('You have already applied for this job.', 'info')
+            return redirect(url_for('view_jobs'))
+
+    try:
+        # Fetch job details to save with the application (optional but good for context)
+        job_doc = db.collection('jobs').document(job_id).get()
+        if not job_doc.exists:
+            flash('Job not found.', 'danger')
+            return redirect(url_for('view_jobs'))
+
+        job_data = job_doc.to_dict()
+
+        # Save application to Firestore
+        application_data = {
+            'job_id': job_id,
+            'job_title': job_data.get('job_title'), # Store title for easier display later
+            'manager_id': job_data.get('manager_id'),
+            'worker_id': worker_id,
+            'worker_email': worker_email,
+            'status': 'pending', # Status: 'pending', 'accepted', 'rejected', 'withdrawn'
+            'applied_at': firestore.SERVER_TIMESTAMP
+        }
+        db.collection('applications').add(application_data)
+        flash('Your application has been submitted!', 'success')
+        return redirect(url_for('view_jobs'))
+    except Exception as e:
+        flash(f'Error applying for job: {e}', 'danger')
+        return redirect(url_for('view_jobs'))
 
 
 # --- Logout Route (Common for both) ---
