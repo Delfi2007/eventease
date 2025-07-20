@@ -1,0 +1,7 @@
+# Virtual environment
+venv/
+*.pyc
+__pycache__/
+
+# Firebase Admin SDK private key
+*.json
