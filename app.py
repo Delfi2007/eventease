@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 import os
+import json
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 from dotenv import load_dotenv 
@@ -10,11 +11,20 @@ load_dotenv()
 
 # --- Firebase Initialization ---
 try:
-    # Ensure this path is correct for your firebase_credentials.json file
-    cred = credentials.Certificate("firebase_credentials.json")
+    # Get Firebase credentials JSON string from environment variable
+    firebase_config_json = os.getenv("FIREBASE_CONFIG_JSON")
+
+    if not firebase_config_json:
+        raise ValueError("FIREBASE_CONFIG_JSON environment variable not set.")
+
+    # Load JSON string into a Python dictionary
+    cred_dict = json.loads(firebase_config_json)
+
+    # Initialize Firebase Admin SDK with credentials from dictionary
+    cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred)
     db = firestore.client()
-    print("Firebase initialized successfully.")
+    print("Firebase initialized successfully from environment variable.")
 except Exception as e:
     print(f"Error initializing Firebase: {e}")
     exit()
@@ -35,6 +45,7 @@ try:
 except Exception as e:
     print(f"Error initializing Gemini AI: {e}")
     gemini_model = None
+
 # --- Common Authentication Functions ---
 def register_user(email, password, user_type):
     try:
