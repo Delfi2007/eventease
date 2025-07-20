@@ -95,6 +95,57 @@ def manager_dashboard():
         return redirect(url_for('manager_login_register'))
     return render_template('manager_dashboard.html', user_email=session['user_email'])
 
+@app.route('/manager/post_job', methods=['GET', 'POST'])
+def post_job():
+    if 'user_id' not in session or session.get('user_type') != 'manager':
+        flash('Please login as an Event Manager to post a job.', 'danger')
+        return redirect(url_for('manager_login_register'))
+
+    if request.method == 'POST':
+        job_title = request.form['job_title']
+        description = request.form['description']
+        required_staff_count = request.form['required_staff_count']
+        job_date = request.form['job_date'] # We will use a text input for simplicity for now
+        job_time = request.form['job_time'] # We will use a text input for simplicity for now
+        location = request.form['location']
+        pay_rate = request.form['pay_rate'] # Simple text field
+        category = request.form['category']
+
+        # Basic validation
+        if not all([job_title, description, required_staff_count, job_date, job_time, location, pay_rate, category]):
+            flash('All fields are required!', 'danger')
+            return redirect(url_for('post_job'))
+
+        try:
+            # Convert staff count to integer
+            required_staff_count = int(required_staff_count)
+        except ValueError:
+            flash('Required Staff Count must be a number.', 'danger')
+            return redirect(url_for('post_job'))
+
+        try:
+            # Save job to Firestore
+            job_data = {
+                'manager_id': session['user_id'],
+                'manager_email': session['user_email'],
+                'job_title': job_title,
+                'description': description,
+                'required_staff_count': required_staff_count,
+                'job_date': job_date,
+                'job_time': job_time,
+                'location': location,
+                'pay_rate': pay_rate,
+                'category': category,
+                'status': 'active', # Initial status
+                'posted_at': firestore.SERVER_TIMESTAMP
+            }
+            db.collection('jobs').add(job_data)
+            flash('Job posted successfully!', 'success')
+            return redirect(url_for('manager_dashboard')) # Redirect to dashboard or my jobs list
+        except Exception as e:
+            flash(f'Error posting job: {e}', 'danger')
+
+    return render_template('post_job.html')
 
 # --- Worker Routes ---
 @app.route('/worker_login_register', methods=['GET', 'POST'])
