@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 import os
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 import json
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
@@ -32,7 +32,7 @@ except Exception as e:
 # --- Flask App Setup ---
 app = Flask(__name__)
 # IMPORTANT: Change this for production! Use a strong, random key.
-app.secret_key = 'your_super_secret_key_here' # For example: os.urandom(24)
+app.secret_key = os.urandom(24) # For example: os.urandom(24)
 
 # Configure Gemini API
 try:
@@ -47,6 +47,7 @@ except Exception as e:
     gemini_model = None
 
 # --- Common Authentication Functions ---
+# --- Common Authentication Functions ---
 def register_user(email, password, user_type):
     try:
         user = auth.create_user(email=email, password=password)
@@ -55,6 +56,9 @@ def register_user(email, password, user_type):
             'email': email,
             'user_type': user_type,
             'created_at': firestore.SERVER_TIMESTAMP
+            # Add initial profile fields here for profile management feature
+            # 'full_name': '', 'phone_number': '', 'address': '', 'skills': [], 'bio': '', # Worker fields
+            # 'company_name': '', 'contact_person': '', 'company_phone': '', 'company_address': '', 'company_description': '' # Manager fields
         })
         return user, None
     except Exception as e:
@@ -66,17 +70,19 @@ def login_user(email, password):
         # using the Admin SDK to check if a user with the email exists.
         # A real app would use the Firebase Client SDK for password validation
         # and token exchange for server-side session management.
+
         user_record = auth.get_user_by_email(email)
         # In a real scenario, you'd also verify the password here securely
         # if this was a purely server-side auth, but Firebase Admin SDK
         # does not expose password verification.
+
+        # If we reach here, the email exists.
         return user_record, None
-    except auth.AuthError as e:
+    except auth.UserNotFoundError: # <-- CHANGE THIS LINE
         return None, "Invalid email or password." # Generic message for security
-    except Exception as e:
+    except Exception as e: # Catch any other unexpected errors
         return None, str(e)
-
-
+    
 # --- Routes ---
 
 @app.route('/')
