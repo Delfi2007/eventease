@@ -4,185 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EventEase - Manager Login/Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/manager_login_register.css') }}">
 </head>
-<body>
-    <div class="main-container">
-        <!-- Left Section with Background Image -->
-        <div class="left-section">
-            <div class="left-content">
-                <div class="brand-logo">EventEase</div>
-                <p class="brand-subtitle">
+<body class="font-['Oxanium'] bg-gradient-to-br from-gray-950 to-gray-800 text-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <div class="flex flex-col lg:flex-row bg-gray-900 rounded-3xl shadow-2xl overflow-hidden w-full max-w-6xl">
+        <div class="relative hidden lg:flex flex-col items-start justify-center p-12 lg:w-1/2 bg-cover bg-center text-left" style="background-image: url('https://source.unsplash.com/random/900x900/?event,party,night');">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent"></div>
+            <div class="relative z-10 text-white">
+                <div class="text-6xl md:text-7xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 leading-tight glitch-text">EventEase</div>
+                <p class="text-lg md:text-xl text-gray-200 mb-8 leading-relaxed font-['Space_Mono']">
                     Manage events seamlessly and create memorable experiences that bring people together
                 </p>
-                <ul class="feature-list">
-                    <li class="feature-item">
-                        <i class="fas fa-check-circle"></i>
+                <ul class="space-y-4">
+                    <li class="flex items-center text-lg">
+                        <i class="fas fa-check-circle text-cyan-400 mr-3 text-xl"></i>
                         <span>Easy Event Management</span>
                     </li>
-                    <li class="feature-item">
-                        <i class="fas fa-users"></i>
+                    <li class="flex items-center text-lg">
+                        <i class="fas fa-users text-cyan-400 mr-3 text-xl"></i>
                         <span>Team Collaboration</span>
                     </li>
-                    <li class="feature-item">
-                        <i class="fas fa-chart-line"></i>
+                    <li class="flex items-center text-lg">
+                        <i class="fas fa-chart-line text-cyan-400 mr-3 text-xl"></i>
                         <span>Analytics & Insights</span>
                     </li>
-                    <li class="feature-item">
-                        <i class="fas fa-shield-alt"></i>
+                    <li class="flex items-center text-lg">
+                        <i class="fas fa-shield-alt text-cyan-400 mr-3 text-xl"></i>
                         <span>Secure & Reliable</span>
                     </li>
                 </ul>
             </div>
         </div>
 
-        <!-- Right Section with Login Form -->
-        <div class="right-section">
-            <div class="login-form-container">
-                <div class="welcome-text">
-                    <h1 class="welcome-title">Welcome</h1>
-                    <p class="welcome-subtitle">Access your event management dashboard</p>
+        <div class="flex flex-col items-center justify-center p-8 sm:p-12 lg:w-1/2 min-h-screen lg:min-h-0">
+            <div class="w-full max-w-md">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl sm:text-5xl font-extrabold text-cyan-400 mb-3">Welcome</h1>
+                    <p class="text-gray-400 text-lg">Access your event management dashboard</p>
                 </div>
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% with messages = get_flashed_messages(with_categories=True) %}
                     {% if messages %}
-                        <div class="mb-3">
+                        <div class="mb-6 space-y-3">
                             {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                                <div class="p-4 rounded-lg text-sm
+                                    {% if category == 'success' %} bg-green-500/20 text-green-300 border border-green-400
+                                    {% elif category == 'danger' %} bg-red-500/20 text-red-300 border border-red-400
+                                    {% elif category == 'warning' %} bg-yellow-500/20 text-yellow-300 border border-yellow-400
+                                    {% else %} bg-blue-500/20 text-blue-300 border border-blue-400
+                                    {% endif %}">
+                                    {{ message }}
+                                </div>
                             {% endfor %}
                         </div>
                     {% endif %}
                 {% endwith %}
 
-                <div class="form-tabs">
-                    <button class="tab-button active" onclick="switchTab('login')">Login</button>
-                    <button class="tab-button" onclick="switchTab('register')">Register</button>
+                <div class="flex border-b border-gray-700 mb-8">
+                    <button class="tab-button flex-1 py-3 text-lg font-semibold text-gray-400 hover:text-cyan-400 transition-colors duration-300 active" onclick="switchTab(event, 'login')">Login</button>
+                    <button class="tab-button flex-1 py-3 text-lg font-semibold text-gray-400 hover:text-cyan-400 transition-colors duration-300" onclick="switchTab(event, 'register')">Register</button>
                 </div>
 
                 <div class="tab-content">
-                    <!-- Login Form -->
                     <div class="tab-pane active" id="login">
-                        <form method="POST" action="{{ url_for('manager_login_register') }}">
+                        <form method="POST" action="{{ url_for('manager_login_register') }}" class="space-y-6">
                             <input type="hidden" name="action" value="login">
                             
-                            <div class="form-group">
-                                <label class="form-label">Email Id</label>
-                                <div class="input-group">
-                                    <i class="fas fa-envelope input-icon"></i>
-                                    <input type="email" class="form-control" id="loginEmail" name="email" placeholder="Enter your email" required>
+                            <div>
+                                <label for="loginEmail" class="block text-gray-300 text-sm font-medium mb-2">Email Id</label>
+                                <div class="relative">
+                                    <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                    <input type="email" class="form-input w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-gray-200 transition-all duration-200" id="loginEmail" name="email" placeholder="Enter your email" required>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label">Password</label>
-                                <div class="input-group">
-                                    <i class="fas fa-lock input-icon"></i>
-                                    <input type="password" class="form-control" id="loginPassword" name="password" placeholder="Enter your password" required>
+                            <div>
+                                <label for="loginPassword" class="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                                <div class="relative">
+                                    <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                    <input type="password" class="form-input w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-gray-200 transition-all duration-200" id="loginPassword" name="password" placeholder="Enter your password" required>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn-login">Login</button>
+                            <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-fuchsia-600 hover:from-cyan-700 hover:to-fuchsia-700 text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-cyan-500/50">Login</button>
                         </form>
 
-                        <div class="divider">
-                            <span>OR</span>
-                        </div>
-
-                        <div class="social-buttons">
-                            <div class="social-btn google">
-                                <i class="fab fa-google"></i>
-                            </div>
-                            <div class="social-btn facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </div>
-                            <div class="social-btn apple">
-                                <i class="fab fa-apple"></i>
-                            </div>
-                        </div>
-
-                        <div class="register-prompt">
-                            Don't have an account? <a href="#" class="register-link" onclick="switchTab('register')">Register Now</a>
+                        <div class="text-center text-gray-400 text-base mt-8">
+                            Don't have an account? <a href="#" class="text-cyan-400 hover:text-cyan-300 font-semibold ml-1" onclick="switchTab(event, 'register')">Register Now</a>
                         </div>
                     </div>
 
-                    <!-- Register Form -->
                     <div class="tab-pane" id="register">
-                        <form method="POST" action="{{ url_for('manager_login_register') }}">
+                        <form method="POST" action="{{ url_for('manager_login_register') }}" class="space-y-6">
                             <input type="hidden" name="action" value="register">
                             
-                            <div class="form-group">
-                                <label class="form-label">Email Id</label>
-                                <div class="input-group">
-                                    <i class="fas fa-envelope input-icon"></i>
-                                    <input type="email" class="form-control" id="registerEmail" name="email" placeholder="Enter your email" required>
+                            <div>
+                                <label for="registerEmail" class="block text-gray-300 text-sm font-medium mb-2">Email Id</label>
+                                <div class="relative">
+                                    <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                    <input type="email" class="form-input w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent text-gray-200 transition-all duration-200" id="registerEmail" name="email" placeholder="Enter your email" required>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label">Password</label>
-                                <div class="input-group">
-                                    <i class="fas fa-lock input-icon"></i>
-                                    <input type="password" class="form-control" id="registerPassword" name="password" placeholder="Create password" required>
+                            <div>
+                                <label for="registerPassword" class="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                                <div class="relative">
+                                    <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                    <input type="password" class="form-input w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent text-gray-200 transition-all duration-200" id="registerPassword" name="password" placeholder="Create password" required>
                                 </div>
-                                <div class="form-text">Minimum 6 characters.</div>
+                                <p class="text-xs text-gray-500 mt-2">Minimum 6 characters.</p>
                             </div>
 
-                            <button type="submit" class="btn-register">Register</button>
+                            <button type="submit" class="w-full bg-gradient-to-r from-fuchsia-600 to-cyan-600 hover:from-fuchsia-700 hover:to-cyan-700 text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-fuchsia-500/50">Register</button>
                         </form>
 
-                        <div class="divider">
-                            <span>OR</span>
-                        </div>
-
-                        <div class="social-buttons">
-                            <div class="social-btn google">
-                                <i class="fab fa-google"></i>
-                            </div>
-                            <div class="social-btn facebook">
-                                <i class="fab fa-facebook-f"></i>
-                            </div>
-                            <div class="social-btn apple">
-                                <i class="fab fa-apple"></i>
-                            </div>
-                        </div>
-
-                        <div class="register-prompt">
-                            Already have an account? <a href="#" class="register-link" onclick="switchTab('login')">Login</a>
+                        <div class="text-center text-gray-400 text-base mt-8">
+                            Already have an account? <a href="#" class="text-fuchsia-400 hover:text-fuchsia-300 font-semibold ml-1" onclick="switchTab(event, 'login')">Login</a>
                         </div>
                     </div>
                 </div>
 
-                <a href="{{ url_for('index') }}" class="back-to-home">← Back to Home</a>
+                <div class="mt-8 text-center">
+                    <a href="{{ url_for('index') }}" class="inline-flex items-center text-gray-400 hover:text-cyan-400 transition-colors duration-300 font-medium">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Home
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
     <script>
-        function switchTab(tabName) {
-            // Remove active class from all tabs and tab buttons
+        function switchTab(event, tabName) {
+            // Remove active class from all tab buttons
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            // Remove active class from all tab panes
             document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
             
-            // Add active class to clicked tab button
+            // Add active class to the clicked tab button
             event.target.classList.add('active');
             
             // Show corresponding tab pane
             document.getElementById(tabName).classList.add('active');
         }
 
-        // Add some interactive effects
-        document.querySelectorAll('.form-control').forEach(input => {
+        // Apply dynamic focus effect to inputs for better UX
+        document.querySelectorAll('.form-input').forEach(input => {
             input.addEventListener('focus', function() {
-                this.parentElement.style.transform = 'translateY(-2px)';
+                this.classList.add('scale-105', 'shadow-lg');
             });
             
             input.addEventListener('blur', function() {
-                this.parentElement.style.transform = 'translateY(0)';
+                this.classList.remove('scale-105', 'shadow-lg');
             });
+        });
+
+        // Set initial tab based on URL hash if needed, or default to login
+        // Example: If URL is login.html#register, show register tab
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.substring(1); // Get hash without '#'
+            if (hash === 'register') {
+                const registerButton = document.querySelector('.tab-button[onclick*="register"]');
+                if (registerButton) {
+                    registerButton.click(); // Programmatically click to switch
+                }
+            } else {
+                // Default to login tab if no hash or invalid hash
+                const loginButton = document.querySelector('.tab-button[onclick*="login"]');
+                if (loginButton) {
+                    loginButton.click();
+                }
+            }
         });
     </script>
 </body>
