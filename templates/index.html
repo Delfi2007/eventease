@@ -4,67 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EventEase - Your Staffing Solution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index_styles.css') }}">
 </head>
-<body>
+<body class="bg-gradient-to-br from-gray-950 to-gray-800 text-gray-100 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div class="dot-pattern"></div>
     <div class="bg-decoration"></div>
     <div class="bg-decoration-2"></div>
     
-    <div class="container">
-        <div class="content-section">
-            <h1 class="logo">EventEase</h1>
-            <p class="subtitle">Professional staffing solutions for modern events. Connect with verified talent instantly through our AI-powered platform.</p>
+    <div class="container mx-auto p-6 md:p-12 flex flex-col lg:flex-row items-center justify-center gap-16 z-10">
+        <div class="content-section text-center lg:text-left max-w-xl">
+            <h1 class="text-7xl md:text-8xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500 leading-tight glitch-text">EventEase</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-10 leading-relaxed font-['Space_Mono']">Professional staffing solutions for modern events. Connect with verified talent instantly through our AI-powered platform.</p>
             
-            <div class="button-container">
-                <a href="{{ url_for('manager_login_register') }}" class="cta-button managerස
-
-System: button manager">
-                    📊 Event Manager
+            <div class="button-container flex flex-col sm:flex-row justify-center lg:justify-start gap-5 mb-16">
+                <a href="{{ url_for('manager_login_register') }}" class="cta-button manager px-10 py-5 text-xl font-bold bg-cyan-600 hover:bg-cyan-700 text-white shadow-lg border-2 border-cyan-500 hover:border-cyan-400">
+                     Event Manager
                 </a>
-                <a href="{{ url_for('worker_login_register') }}" class="cta-button worker">
-                    👤 Find Work
+                <a href="{{ url_for('worker_login_register') }}" class="cta-button worker px-10 py-5 text-xl font-bold bg-fuchsia-600 hover:bg-fuchsia-700 text-white shadow-lg border-2 border-fuchsia-500 hover:border-fuchsia-400">
+                     Find Work
                 </a>
             </div>
             
-            <div class="stats-grid">
+            <div class="stats-grid grid grid-cols-1 md:grid-cols-3 gap-8 text-center bg-gray-900 p-8 rounded-2xl shadow-2xl border border-gray-700">
                 <div class="stat-item">
-                    <div class="stat-number">10K+</div>
-                    <div class="stat-label">Active Workers</div>
+                    <div class="stat-number text-5xl font-extrabold text-lime-400 mb-2 font-['Space_Mono']">10K+</div>
+                    <div class="stat-label text-gray-400 text-sm uppercase tracking-widest">Active Workers</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">500+</div>
-                    <div class="stat-label">Events Monthly</div>
+                    <div class="stat-number text-5xl font-extrabold text-sky-400 mb-2 font-['Space_Mono']">500+</div>
+                    <div class="stat-label text-gray-400 text-sm uppercase tracking-widest">Events Monthly</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">98%</div>
-                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-number text-5xl font-extrabold text-orange-400 mb-2 font-['Space_Mono']">98%</div>
+                    <div class="stat-label text-gray-400 text-sm uppercase tracking-widest">Success Rate</div>
                 </div>
             </div>
         </div>
         
-        <div class="visual-section">
-            <div class="blob-container">
+        <div class="visual-section flex items-center justify-center mt-20 lg:mt-0">
+            <div class="blob-container" id="spin-trigger">
                 <div class="main-blob"></div>
                 
-                <div class="rotating-images">
-                    <div class="floating-icon icon-1">🎯</div>
-                    <div class="floating-icon icon-2">⚡</div>
-                    <div class="floating-icon icon-3">🔒</div>
-                    <div class="floating-icon icon-4">📱</div>
-                    <div class="floating-icon icon-5">🎪</div>
-                    <div class="floating-icon icon-6">👥</div>
+                <div class="rotating-images" id="rotating-images">
+                    <div class="data-point point-1"></div>
+                    <div class="data-point point-2"></div>
+                    <div class="data-point point-3"></div>
+                    <div class="data-point point-4"></div>
+                    <div class="data-point point-5"></div>
+                    <div class="data-point point-6"></div>
                 </div>
                 
-                <div class="center-logo glow">E</div>
+                <div class="center-logo glow-pulse">E</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Add interactive hover effects
         document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.querySelectorAll('.cta-button');
-            const floatingIcons = document.querySelectorAll('.floating-icon');
+            const spinTrigger = document.getElementById('spin-trigger');
+            const rotatingImages = document.getElementById('rotating-images');
             
             // Button ripple effect
             buttons.forEach(button => {
@@ -81,7 +82,7 @@ System: button manager">
                         height: ${size}px;
                         left: ${x}px;
                         top: ${y}px;
-                        background: rgba(26, 26, 46, 0.3);
+                        background: rgba(255, 255, 255, 0.3);
                         border-radius: 50%;
                         transform: scale(0);
                         animation: ripple 0.6s ease-out;
@@ -89,34 +90,40 @@ System: button manager">
                     `;
                     
                     this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
                     this.appendChild(ripple);
                     
                     setTimeout(() => ripple.remove(), 600);
                 });
             });
 
-            // Icon hover pause
-            floatingIcons.forEach(icon => {
-                icon.addEventListener('mouseenter', function() {
-                    this.parentElement.style.animationPlayState = 'paused';
-                });
-                
-                icon.addEventListener('mouseleave', function() {
-                    this.parentElement.style.animationPlayState = 'running';
-                });
-            });
+            // Spin Wheel Interaction
+            let isSpinning = false;
+            let spinTimeout;
 
-            // Add CSS for ripple animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes ripple {
-                    to {
-                        transform: scale(2);
-                        opacity: 0;
-                    }
+            spinTrigger.addEventListener('click', function() {
+                if (isSpinning) {
+                    // Stop the spin
+                    clearTimeout(spinTimeout);
+                    rotatingImages.classList.remove('spin-active');
+                    rotatingImages.style.animation = 'rotate 25s linear infinite';
+                    isSpinning = false;
+                } else {
+                    // Start the spin
+                    rotatingImages.classList.add('spin-active');
+                    rotatingImages.style.animation = 'none'; // Clear default rotation
+                    isSpinning = true;
+
+                    // Automatically stop the spin after 1.5 seconds (slightly longer than animation)
+                    spinTimeout = setTimeout(() => {
+                        if (isSpinning) { // Check if it's still spinning before stopping
+                            rotatingImages.classList.remove('spin-active');
+                            rotatingImages.style.animation = 'rotate 25s linear infinite'; // Revert to slow rotation
+                            isSpinning = false;
+                        }
+                    }, 1500); // 1.5 seconds
                 }
-            `;
-            document.head.appendChild(style);
+            });
         });
     </script>
 </body>
