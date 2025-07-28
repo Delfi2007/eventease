@@ -1,191 +1,79 @@
-/* Custom styles for animations, specific shapes, and glitch effects */
-body {
-    font-family: 'Oxanium', sans-serif;
-    overflow: hidden;
-}
-
-/* Glitch effect for the logo - custom animation */
-.glitch-text {
-    animation: glitch 1s linear infinite;
-}
-@keyframes glitch {
-    0% { text-shadow: 0.05em 0 0 #ff00c1, -0.05em -0.025em 0 #00ffff, -0.025em 0.05em 0 #ffc100; }
-    14% { text-shadow: -0.05em -0.025em 0 #ff00c1, 0.025em 0.025em 0 #00ffff, -0.05em -0.05em 0 #ffc100; }
-    15% { text-shadow: none; }
-    100% { text-shadow: none; }
-}
-
-/* Dot pattern background */
-.dot-pattern {
-    background-image: radial-gradient(#374151 1px, transparent 1px);
-    background-size: 20px 20px;
-    opacity: 0.2;
+/* Custom styles for the background image overlay */
+.hero-background {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -2;
+    background-size: cover;
+    background-position: center;
+    /* Placeholder image - replace with your actual image */
+    background-image: url('https://source.unsplash.com/random/1600x900/?event-planning,conference,people');
 }
 
-/* Background decorations - adjusted colors */
-.bg-decoration, .bg-decoration-2 {
+.hero-background-overlay {
     position: absolute;
-    width: 200px;
-    height: 200px;
-    background: rgba(0, 255, 255, 0.15);
-    border-radius: 50%;
-    filter: blur(100px);
-    z-index: -1;
-    animation: float 10s ease-in-out infinite;
-}
-.bg-decoration { top: 5%; left: 8%; }
-.bg-decoration-2 {
-    bottom: 5%;
-    right: 8%;
-    background: rgba(255, 0, 193, 0.15);
-    animation-delay: 2s;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7); /* 70% white overlay for text readability */
 }
 
-/* Blob container and main blob - adjusted colors and pulse */
-.blob-container {
-    position: relative;
-    width: 500px;
-    height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.3s ease;
+/* Custom button styling for rounded-pill if Bootstrap's .rounded-pill isn't enough,
+    or for custom colors not directly in Bootstrap palette */
+.btn-custom-blue {
+    background-color: #0d6efd; /* Bootstrap primary blue */
+    border-color: #0d6efd;
+    color: #fff;
+    padding: 1rem 2.5rem; /* Equivalent to py-4 px-8 */
+    font-weight: 600; /* font-semibold */
+    border-radius: 50rem; /* rounded-full */
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; /* shadow-lg */
 }
-.blob-container:hover {
-    transform: scale(1.05);
-}
-.main-blob {
-    background: linear-gradient(135deg, #00ffff, #ff00c1);
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.6;
-    position: absolute;
-    width: 350px;
-    height: 350px;
-    animation: pulse-grow 5s infinite alternate;
+.btn-custom-blue:hover {
+    background-color: #0b5ed7; /* Darker blue on hover */
+    border-color: #0a58ca;
 }
 
-/* Rotating images for the spin wheel effect */
-.rotating-images {
-    position: absolute;
-    width: 450px;
-    height: 450px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: rotate 25s linear infinite; /* default slow rotation */
+.btn-custom-dark {
+    background-color: #343a40; /* Bootstrap dark gray */
+    border-color: #343a40;
+    color: #fff;
+    padding: 1rem 2.5rem; /* Equivalent to py-4 px-8 */
+    font-weight: 600; /* font-semibold */
+    border-radius: 50rem; /* rounded-full */
+    transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; /* shadow-lg */
 }
-.rotating-images.spin-active {
-    animation: spin-wheel 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; /* Dynamic, fast spin */
-}
-
-/* New: Data point styles */
-.data-point {
-    position: absolute;
-    width: 20px; /* Size of the data point */
-    height: 20px;
-    background: linear-gradient(45deg, #00ffff, #ff00c1); /* Vibrant gradient */
-    border-radius: 50%;
-    box-shadow: 0 0 10px #00ffff, 0 0 20px #ff00c1; /* Double glow */
-    opacity: 0.8;
-    animation: data-pulse 1.5s infinite alternate; /* Subtle individual pulse */
-    transition: transform 0.3s ease;
-}
-.data-point:nth-child(even) { /* Vary pulse timing */
-    animation-delay: 0.2s;
-}
-.spin-active .data-point {
-    animation: counter-rotate 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards; /* Counter-rotate with wheel */
+.btn-custom-dark:hover {
+    background-color: #2b3035; /* Darker gray on hover */
+    border-color: #292d32;;
 }
 
-/* Hexagonal arrangement for 6 data points */
-/* Center is 225px, 225px (half of 450px rotating-images container) */
-/* Radius for arrangement, adjust as needed */
-.data-point:nth-child(1) { top: 20%; left: 50%; transform: translate(-50%, -50%); } /* Top */
-.data-point:nth-child(2) { top: 35%; left: 85%; transform: translate(-50%, -50%); } /* Top-right */
-.data-point:nth-child(3) { top: 65%; left: 85%; transform: translate(-50%, -50%); } /* Bottom-right */
-.data-point:nth-child(4) { top: 80%; left: 50%; transform: translate(-50%, -50%); } /* Bottom */
-.data-point:nth-child(5) { top: 65%; left: 15%; transform: translate(-50%, -50%); } /* Bottom-left */
-.data-point:nth-child(6) { top: 35%; left: 15%; transform: translate(-50%, -50%); } /* Top-left */
-
-/* Center logo with new font and glow */
-.center-logo {
-    font-family: 'Space Mono', monospace;
-    font-size: 7rem;
-    font-weight: bold;
-    color: #00ffff;
-    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.5);
-    position: absolute;
-    z-index: 10;
-    pointer-events: none; /* Make clicks pass through to the parent blob-container */
+/* Adjust font sizes for stats for Bootstrap context */
+.stat-number {
+    font-size: 3.5rem; /* approx text-5xl */
+    font-weight: 800; /* font-extrabold */
 }
-.glow-pulse {
-    animation: glow-pulse 2s infinite alternate;
-}
-.cta-button {
-    transition: all 0.3s ease-in-out;
-    animation: button-pulse 3s infinite ease-in-out;
-    border-radius: 9999px; /* Tailwind's rounded-full */
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-.cta-button:hover {
-    transform: scale(1.08) rotate(1deg);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4);
-}
-.cta-button.manager:hover {
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4);
-}
-.cta-button.worker:hover {
-    box-shadow: 0 0 15px rgba(255, 0, 193, 0.6), 0 0 30px rgba(255, 0, 193, 0.4);
+.stat-label {
+    font-size: 0.875rem; /* text-sm */
+    text-transform: uppercase;
+    letter-spacing: 0.1em; /* tracking-widest */
 }
 
-/* Keyframe Animations */
-@keyframes float {
-    0% { transform: translate(0px, 0px); }
-    50% { transform: translate(-10px, -20px); }
-    100% { transform: translate(0px, 0px); }
+/* Hero section min-height adjustment */
+.hero-section {
+    min-height: calc(100vh - 76px); /* 100vh - header height (approx py-4*2 + default navbar height) */
+    position: relative; /* For background positioning */
+    display: flex; /* For centering content */
+    align-items: center; /* For centering content vertically */
+    justify-content: flex-start; /* Aligns content to start, then adjust with col-lg-6 */
+    overflow: hidden; /* Prevent background from overflowing */
 }
-@keyframes pulse-grow {
-    0% { transform: scale(0.95); opacity: 0.6; }
-    100% { transform: scale(1.05); opacity: 0.7; }
-}
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-/* New keyframes for spin wheel */
-@keyframes spin-wheel {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-@keyframes counter-rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(-360deg); }
-}
-@keyframes glow-pulse {
-    from { text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5); }
-    to { text-shadow: 0 0 20px rgba(0, 255, 255, 0.9), 0 0 35px rgba(0, 255, 255, 0.7); }
-}
-@keyframes ripple {
-    to { transform: scale(2); opacity: 0; }
-}
-@keyframes button-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.01); }
-    100% { transform: scale(1); }
-}
-/* New: Data point individual pulse */
-@keyframes data-pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); opacity: 0.8; }
+
+/* Custom text color for EventEase brand part */
+.brand-blue {
+    color: #0d6efd; /* Bootstrap's primary blue */
 }
